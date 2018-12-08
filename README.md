@@ -1,9 +1,8 @@
 # esx_vehicleshop_lite
+esx汽车经销商插件的阉割版，只保留了全自动销售回收载具功能，其他社会化管理以及驾驶执照要求全部干掉。
 
-## Requirements
-
-* Auto mode (everyone can buy vehicles from the dealer)
-  * No need to download another resource
+## 版本说明
+-- [v1.0.0] 支持官方es_extended插件,魔改版es_extended可能会报错
 
 # Legal
 ### License
