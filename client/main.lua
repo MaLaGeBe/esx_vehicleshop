@@ -218,13 +218,15 @@ function OpenShopMenu()
 	end)
 
 	DeleteShopInsideVehicles()
-	WaitForVehicleToLoad(firstVehicleData.model)
+	if firstVehicleData ~= nil then
+		WaitForVehicleToLoad(firstVehicleData.model)
 
-	ESX.Game.SpawnLocalVehicle(firstVehicleData.model, Config.Zones.ShopInside.Pos, Config.Zones.ShopInside.Heading, function (vehicle)
-		table.insert(LastVehicles, vehicle)
-		TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
-		FreezeEntityPosition(vehicle, true)
-	end)
+		ESX.Game.SpawnLocalVehicle(firstVehicleData.model, Config.Zones.ShopInside.Pos, Config.Zones.ShopInside.Heading, function (vehicle)
+			table.insert(LastVehicles, vehicle)
+			TaskWarpPedIntoVehicle(playerPed, vehicle, -1)
+			FreezeEntityPosition(vehicle, true)
+		end)
+	end
 
 end
 
@@ -307,59 +309,6 @@ function OpenRentedVehiclesMenu()
 	end)
 end
 
-function OpenBossActionsMenu()
-	ESX.UI.Menu.CloseAll()
-
-	ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'reseller',{
-		title    = _U('dealer_boss'),
-		align    = 'top-left',
-		elements = {
-			{label = _U('boss_actions'), value = 'boss_actions'},
-			{label = _U('boss_sold'), value = 'sold_vehicles'}
-		}
-	}, function (data, menu)
-		if data.current.value == 'boss_actions' then
-			TriggerEvent('esx_society:openBossMenu', 'cardealer', function(data2, menu2)
-				menu2.close()
-			end)
-		elseif data.current.value == 'sold_vehicles' then
-
-			ESX.TriggerServerCallback('esx_vehicleshop_lite:getSoldVehicles', function(customers)
-				local elements = {
-					head = { _U('customer_client'), _U('customer_model'), _U('customer_plate'), _U('customer_soldby'), _U('customer_date') },
-					rows = {}
-				}
-		
-				for i=1, #customers, 1 do
-					table.insert(elements.rows, {
-						data = customers[i],
-						cols = {
-							customers[i].client,
-							customers[i].model,
-							customers[i].plate,
-							customers[i].soldby,
-							customers[i].date
-						}
-					})
-				end
-
-				ESX.UI.Menu.Open('list', GetCurrentResourceName(), 'sold_vehicles', elements, function(data2, menu2)
-
-				end, function(data2, menu2)
-					menu2.close()
-				end)
-			end)
-		end
-
-	end, function (data, menu)
-		menu.close()
-
-		CurrentAction     = 'boss_actions_menu'
-		CurrentActionMsg  = _U('shop_menu')
-		CurrentActionData = {}
-	end)
-end
-
 AddEventHandler('esx_vehicleshop_lite:hasEnteredMarker', function (zone)
 	if zone == 'ShopEntering' then
 		CurrentAction     = 'shop_menu'
@@ -381,21 +330,24 @@ AddEventHandler('esx_vehicleshop_lite:hasEnteredMarker', function (zone)
 						break
 					end
 				end
-	
-				resellPrice = ESX.Math.Round(vehicleData.price / 100 * Config.ResellPercentage)
-				model = string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle)))
-				plate = ESX.Math.Trim(GetVehicleNumberPlateText(vehicle))
-	
-				CurrentAction     = 'resell_vehicle'
-				CurrentActionMsg  = _U('sell_menu', vehicleData.name, ESX.Math.GroupDigits(resellPrice))
-	
-				CurrentActionData = {
-					vehicle = vehicle,
-					label = vehicleData.name,
-					price = resellPrice,
-					model = model,
-					plate = plate
-				}
+				if vehicleData ~= nil then
+					resellPrice = ESX.Math.Round(vehicleData.price / 100 * Config.ResellPercentage)
+					model = string.lower(GetDisplayNameFromVehicleModel(GetEntityModel(vehicle)))
+					plate = ESX.Math.Trim(GetVehicleNumberPlateText(vehicle))
+		
+					CurrentAction     = 'resell_vehicle'
+					CurrentActionMsg  = _U('sell_menu', vehicleData.name, ESX.Math.GroupDigits(resellPrice))
+		
+					CurrentActionData = {
+						vehicle = vehicle,
+						label = vehicleData.name,
+						price = resellPrice,
+						model = model,
+						plate = plate
+					}
+				else
+					ESX.ShowNotification(_U('not_this_car'))
+				end
 			end
 		end
 	end
