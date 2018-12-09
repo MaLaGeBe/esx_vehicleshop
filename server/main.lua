@@ -101,14 +101,19 @@ ESX.RegisterServerCallback('esx_vehicleshop_lite:buyVehicle', function (source, 
 end)
 
 ESX.RegisterServerCallback('esx_vehicleshop_lite:resellVehicle', function (source, cb, plate, model)
-	local resellPrice
+	local resellPrice = 0
 
 	-- calculate the resell price
 	for i=1, #Vehicles, 1 do
-		if Vehicles[i].model == model then
+		if GetHashKey(Vehicles[i].model) == model then
 			resellPrice = ESX.Math.Round(Vehicles[i].price / 100 * Config.ResellPercentage)
 			break
 		end
+	end
+
+	if resellPrice == 0 then
+		print(('esx_vehicleshop: %s attempted to sell an unknown vehicle!'):format(GetPlayerIdentifiers(source)[1]))
+		cb(false)
 	end
 
 	MySQL.Async.fetchAll('SELECT * FROM rented_vehicles WHERE plate = @plate', {
@@ -128,10 +133,11 @@ ESX.RegisterServerCallback('esx_vehicleshop_lite:resellVehicle', function (sourc
 
 					local vehicle = json.decode(result[1].vehicle)
 
-					if vehicle.model == GetHashKey(model) then
+					if vehicle.model == model then
 						if vehicle.plate == plate then
 							xPlayer.addMoney(resellPrice)
 							RemoveOwnedVehicle(plate)
+							
 							cb(true)
 						else
 							print(('esx_vehicleshop_lite: %s attempted to sell an vehicle with plate mismatch!'):format(xPlayer.identifier))
@@ -141,41 +147,8 @@ ESX.RegisterServerCallback('esx_vehicleshop_lite:resellVehicle', function (sourc
 						print(('esx_vehicleshop_lite: %s attempted to sell an vehicle with model mismatch!'):format(xPlayer.identifier))
 						cb(false)
 					end
-
 				else
-
-					if xPlayer.job.grade_name == 'boss' then
-						MySQL.Async.fetchAll('SELECT * FROM owned_vehicles WHERE owner = @owner AND @plate = plate', {
-							['@owner'] = 'society:' .. xPlayer.job.name,
-							['@plate'] = plate
-						}, function (result)
-
-							if result[1] then
-
-								local vehicle = json.decode(result[1].vehicle)
-
-								if vehicle.model == GetHashKey(model) then
-									if vehicle.plate == plate then
-										xPlayer.addMoney(resellPrice)
-										RemoveOwnedVehicle(plate)
-										cb(true)
-									else
-										print(('esx_vehicleshop_lite: %s attempted to sell an vehicle with plate mismatch!'):format(xPlayer.identifier))
-										cb(false)
-									end
-								else
-									print(('esx_vehicleshop_lite: %s attempted to sell an vehicle with model mismatch!'):format(xPlayer.identifier))
-									cb(false)
-								end
-
-							else
-								cb(false)
-							end
-
-						end)
-					else
-						cb(false)
-					end
+					cb(false)
 				end
 
 			end)
