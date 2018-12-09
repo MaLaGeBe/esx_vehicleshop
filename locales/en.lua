@@ -1,23 +1,18 @@
 Locales['en'] = {
-  -- global menus
+  --Global menus
   ['vehicle_belongs']         = 'an vehicle with plate ~y~%s~s~ now belongs to ~b~you~s~',
   ['buy_vehicle_shop']        = 'do you want to purchase %s for $%s?',
   ['car_dealer']              = 'car Dealership',
   ['not_this_car']            = 'sorry,we don\'t need this car!',
   ['shop_awaiting_model']     = 'the vehicle is currently ~g~DOWNLOADING & LOADING~s~ please wait',
-  ['delivered']               = 'the vehicle has been ~g~delivered~s~ to the dealer',
   ['no']                      = 'no',
   ['yes']                     = 'yes',
   ['not_enough_money']        = 'you do not have enough money',
-  ['not_rental']              = 'this is not a ~r~rental vehicle~s~',
   ['not_yours']               = 'this vehicle does not belong to you',
-  ['paid_rental']             = 'you have ~g~payed~s~ for your vehicle rental: ~g~$%s~s~',
-  ['pop_vehicle']             = 'put out vehicle for sale',
   ['rent_vehicle']            = 'car Dealer - Vehicles for rent',
   ['sell_menu']               = 'press ~INPUT_CONTEXT~ to sell your ~y~%s~s~ for ~g~$%s~s~',
   ['shop_menu']               = 'press ~INPUT_CONTEXT~ to access the menu',
   ['generic_shopitem']        = '$%s',
-  ['vehicle_dealer']          = 'vehicle - Car Dealer',
   ['vehicle_purchased']       = 'you bought a vehicle',
   ['vehicle_sold_for']        = 'the ~b~%s~s~ has been ~y~sold~s~ for ~g~$%s~s~',
 }

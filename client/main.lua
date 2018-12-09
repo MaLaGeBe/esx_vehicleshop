@@ -106,11 +106,23 @@ function OpenShopMenu()
 		local categoryVehicles = vehiclesByCategory[category.name]
 		local options          = {}
 
+		if Config.Locale == 'zh' then
+			category.label = category.label_zh
+		elseif Config.Locale == 'cn' then
+			category.label = category.label_cn
+		end
+
 		for j=1, #categoryVehicles, 1 do
 			local vehicle = categoryVehicles[j]
 
 			if i == 1 and j == 1 then
 				firstVehicleData = vehicle
+			end
+
+			if Config.Locale == 'zh' then
+				vehicle.name = vehicle.name_zh
+			elseif Config.Locale == 'cn' then
+				vehicle.name = vehicle.name_cn
 			end
 
 			table.insert(options, ('%s <span style="color:green;">%s</span>'):format(vehicle.name, _U('generic_shopitem', ESX.Math.GroupDigits(vehicle.price))))
@@ -251,64 +263,6 @@ function WaitForVehicleToLoad(modelHash)
 	end
 end
 
-function OpenPopVehicleMenu()
-	ESX.TriggerServerCallback('esx_vehicleshop_lite:getCommercialVehicles', function (vehicles)
-		local elements = {}
-
-		for i=1, #vehicles, 1 do
-			table.insert(elements, {
-				label = ('%s [MSRP <span style="color:green;">%s</span>]'):format(vehicles[i].name, _U('generic_shopitem', ESX.Math.GroupDigits(vehicles[i].price))),
-				value = vehicles[i].name
-			})
-		end
-
-		ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'commercial_vehicles',
-		{
-			title    = _U('vehicle_dealer'),
-			align    = 'top-left',
-			elements = elements
-		}, function (data, menu)
-			local model = data.current.value
-
-			DeleteShopInsideVehicles()
-
-			ESX.Game.SpawnVehicle(model, Config.Zones.ShopInside.Pos, Config.Zones.ShopInside.Heading, function (vehicle)
-				table.insert(LastVehicles, vehicle)
-
-				for i=1, #Vehicles, 1 do
-					if model == Vehicles[i].model then
-						CurrentVehicleData = Vehicles[i]
-						break
-					end
-				end
-			end)
-		end, function (data, menu)
-			menu.close()
-		end)
-	end)
-end
-
-function OpenRentedVehiclesMenu()
-	ESX.TriggerServerCallback('esx_vehicleshop_lite:getRentedVehicles', function (vehicles)
-		local elements = {}
-
-		for i=1, #vehicles, 1 do
-			table.insert(elements, {
-				label = ('%s: %s - <span style="color:orange;">%s</span>'):format(vehicles[i].playerName, vehicles[i].name, vehicles[i].plate),
-				value = vehicles[i].name
-			})
-		end
-
-		ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'rented_vehicles', {
-			title    = _U('rent_vehicle'),
-			align    = 'top-left',
-			elements = elements
-		}, nil, function (data, menu)
-			menu.close()
-		end)
-	end)
-end
-
 AddEventHandler('esx_vehicleshop_lite:hasEnteredMarker', function (zone)
 	if zone == 'ShopEntering' then
 		CurrentAction     = 'shop_menu'
@@ -443,39 +397,20 @@ Citizen.CreateThread(function()
 		if CurrentAction == nil then
 			Citizen.Wait(500)
 		else
-
 			ESX.ShowHelpNotification(CurrentActionMsg)
-
 			if IsControlJustReleased(0, Keys['E']) then
 				if CurrentAction == 'shop_menu' then
 					OpenShopMenu()
-				elseif CurrentAction == 'reseller_menu' then
-					OpenResellerMenu()
-				elseif CurrentAction == 'give_back_vehicle' then
-					ESX.TriggerServerCallback('esx_vehicleshop_lite:giveBackVehicle', function(isRentedVehicle)
-						if isRentedVehicle then
-							ESX.Game.DeleteVehicle(CurrentActionData.vehicle)
-							ESX.ShowNotification(_U('delivered'))
-						else
-							ESX.ShowNotification(_U('not_rental'))
-						end
-					end, ESX.Math.Trim(GetVehicleNumberPlateText(CurrentActionData.vehicle)))
-
 				elseif CurrentAction == 'resell_vehicle' then
-
 					ESX.TriggerServerCallback('esx_vehicleshop_lite:resellVehicle', function(vehicleSold)
-
 						if vehicleSold then
 							ESX.Game.DeleteVehicle(CurrentActionData.vehicle)
 							ESX.ShowNotification(_U('vehicle_sold_for', CurrentActionData.label, ESX.Math.GroupDigits(CurrentActionData.price)))
 						else
 							ESX.ShowNotification(_U('not_yours'))
 						end
-
 					end, CurrentActionData.plate, CurrentActionData.model)
-
 				end
-
 				CurrentAction = nil
 			end
 		end
@@ -492,7 +427,13 @@ Citizen.CreateThread(function()
 end)
 
 function drawLoadingText(text, red, green, blue, alpha)
-	SetTextFont(4)
+	if Config.Locale == 'zh' then
+		SetTextFont(9)
+	elseif Config.Locale == 'cn' then
+		SetTextFont(12)
+	else 
+		SetTextFont(4)
+	end
 	SetTextProportional(0)
 	SetTextScale(0.0, 0.5)
 	SetTextColour(red, green, blue, alpha)
@@ -506,3 +447,8 @@ function drawLoadingText(text, red, green, blue, alpha)
 	AddTextComponentSubstringPlayerName(text)
 	EndTextCommandDisplayText(0.5, 0.5)
 end
+
+RegisterNetEvent('esx:showVehicleNotification')
+AddEventHandler('esx:showVehicleNotification', function(msg,num)
+	ESX.ShowNotification(_U(msg,num))
+end)
