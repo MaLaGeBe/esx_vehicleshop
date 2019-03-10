@@ -165,11 +165,11 @@ ESX.RegisterServerCallback('esx_vehicleshop:resellVehicle', function (source, cb
 
 										cb(true)
 									else
-										print(('esx_vehicleshop: %s attempted to sell an vehicle with plate mismatch!'):format(xPlayer.identifier))
+										print(('esx_vehicleshop_lite: %s attempted to sell an vehicle with plate mismatch!'):format(xPlayer.identifier))
 										cb(false)
 									end
 								else
-									print(('esx_vehicleshop: %s attempted to sell an vehicle with model mismatch!'):format(xPlayer.identifier))
+									print(('esx_vehicleshop_lite: %s attempted to sell an vehicle with model mismatch!'):format(xPlayer.identifier))
 									cb(false)
 								end
 
@@ -188,7 +188,7 @@ ESX.RegisterServerCallback('esx_vehicleshop:resellVehicle', function (source, cb
 	end)
 end)
 
-ESX.RegisterServerCallback('esx_vehicleshop:isPlateTaken', function (source, cb, plate)
+ESX.RegisterServerCallback('esx_vehicleshop_lite:isPlateTaken', function (source, cb, plate)
 	MySQL.Async.fetchAll('SELECT * FROM owned_vehicles WHERE plate = @plate', {
 		['@plate'] = plate
 	}, function (result)
@@ -196,7 +196,7 @@ ESX.RegisterServerCallback('esx_vehicleshop:isPlateTaken', function (source, cb,
 	end)
 end)
 
-ESX.RegisterServerCallback('esx_vehicleshop:retrieveJobVehicles', function (source, cb, type)
+ESX.RegisterServerCallback('esx_vehicleshop_lite:retrieveJobVehicles', function (source, cb, type)
 	local xPlayer = ESX.GetPlayerFromId(source)
 
 	MySQL.Async.fetchAll('SELECT * FROM owned_vehicles WHERE owner = @owner AND type = @type AND job = @job', {
@@ -208,8 +208,8 @@ ESX.RegisterServerCallback('esx_vehicleshop:retrieveJobVehicles', function (sour
 	end)
 end)
 
-RegisterServerEvent('esx_vehicleshop:setJobVehicleState')
-AddEventHandler('esx_vehicleshop:setJobVehicleState', function(plate, state)
+RegisterServerEvent('esx_vehicleshop_lite:setJobVehicleState')
+AddEventHandler('esx_vehicleshop_lite:setJobVehicleState', function(plate, state)
 	local xPlayer = ESX.GetPlayerFromId(source)
 
 	MySQL.Async.execute('UPDATE owned_vehicles SET `stored` = @stored WHERE plate = @plate AND job = @job', {
@@ -218,7 +218,7 @@ AddEventHandler('esx_vehicleshop:setJobVehicleState', function(plate, state)
 		['@job'] = xPlayer.job.name
 	}, function(rowsChanged)
 		if rowsChanged == 0 then
-			print(('esx_vehicleshop: %s exploited the garage!'):format(xPlayer.identifier))
+			print(('esx_vehicleshop_lite: %s exploited the garage!'):format(xPlayer.identifier))
 		end
 	end)
 end)
