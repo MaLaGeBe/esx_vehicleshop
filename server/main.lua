@@ -100,7 +100,7 @@ ESX.RegisterServerCallback('esx_vehicleshop_lite:buyVehicle', function (source, 
 	end
 end)
 
-ESX.RegisterServerCallback('esx_vehicleshop_lite:resellVehicle', function (source, cb, plate, model)
+ESX.RegisterServerCallback('esx_vehicleshop:resellVehicle', function (source, cb, plate, model)
 	local resellPrice = 0
 
 	-- calculate the resell price
@@ -137,7 +137,6 @@ ESX.RegisterServerCallback('esx_vehicleshop_lite:resellVehicle', function (sourc
 						if vehicle.plate == plate then
 							xPlayer.addMoney(resellPrice)
 							RemoveOwnedVehicle(plate)
-							
 							cb(true)
 						else
 							print(('esx_vehicleshop_lite: %s attempted to sell an vehicle with plate mismatch!'):format(xPlayer.identifier))
@@ -148,7 +147,40 @@ ESX.RegisterServerCallback('esx_vehicleshop_lite:resellVehicle', function (sourc
 						cb(false)
 					end
 				else
-					cb(false)
+
+					if xPlayer.job.grade_name == 'boss' then
+						MySQL.Async.fetchAll('SELECT * FROM owned_vehicles WHERE owner = @owner AND @plate = plate', {
+							['@owner'] = 'society:' .. xPlayer.job.name,
+							['@plate'] = plate
+						}, function (result)
+
+							if result[1] then
+
+								local vehicle = json.decode(result[1].vehicle)
+
+								if vehicle.model == model then
+									if vehicle.plate == plate then
+										xPlayer.addMoney(resellPrice)
+										RemoveOwnedVehicle(plate)
+
+										cb(true)
+									else
+										print(('esx_vehicleshop: %s attempted to sell an vehicle with plate mismatch!'):format(xPlayer.identifier))
+										cb(false)
+									end
+								else
+									print(('esx_vehicleshop: %s attempted to sell an vehicle with model mismatch!'):format(xPlayer.identifier))
+									cb(false)
+								end
+
+							else
+								cb(false)
+							end
+
+						end)
+					else
+						cb(false)
+					end
 				end
 
 			end)
@@ -156,10 +188,63 @@ ESX.RegisterServerCallback('esx_vehicleshop_lite:resellVehicle', function (sourc
 	end)
 end)
 
-ESX.RegisterServerCallback('esx_vehicleshop_lite:isPlateTaken', function (source, cb, plate)
-	MySQL.Async.fetchAll('SELECT * FROM owned_vehicles WHERE @plate = plate', {
+ESX.RegisterServerCallback('esx_vehicleshop:isPlateTaken', function (source, cb, plate)
+	MySQL.Async.fetchAll('SELECT * FROM owned_vehicles WHERE plate = @plate', {
 		['@plate'] = plate
 	}, function (result)
 		cb(result[1] ~= nil)
 	end)
 end)
+
+ESX.RegisterServerCallback('esx_vehicleshop:retrieveJobVehicles', function (source, cb, type)
+	local xPlayer = ESX.GetPlayerFromId(source)
+
+	MySQL.Async.fetchAll('SELECT * FROM owned_vehicles WHERE owner = @owner AND type = @type AND job = @job', {
+		['@owner'] = xPlayer.identifier,
+		['@type'] = type,
+		['@job'] = xPlayer.job.name
+	}, function (result)
+		cb(result)
+	end)
+end)
+
+RegisterServerEvent('esx_vehicleshop:setJobVehicleState')
+AddEventHandler('esx_vehicleshop:setJobVehicleState', function(plate, state)
+	local xPlayer = ESX.GetPlayerFromId(source)
+
+	MySQL.Async.execute('UPDATE owned_vehicles SET `stored` = @stored WHERE plate = @plate AND job = @job', {
+		['@stored'] = state,
+		['@plate'] = plate,
+		['@job'] = xPlayer.job.name
+	}, function(rowsChanged)
+		if rowsChanged == 0 then
+			print(('esx_vehicleshop: %s exploited the garage!'):format(xPlayer.identifier))
+		end
+	end)
+end)
+
+function PayRent(d, h, m)
+	MySQL.Async.fetchAll('SELECT * FROM rented_vehicles', {}, function (result)
+		for i=1, #result, 1 do
+			local xPlayer = ESX.GetPlayerFromIdentifier(result[i].owner)
+
+			-- message player if connected
+			if xPlayer ~= nil then
+				xPlayer.removeAccountMoney('bank', result[i].rent_price)
+				TriggerClientEvent('esx:showNotification', xPlayer.source, _U('paid_rental', ESX.Math.GroupDigits(result[i].rent_price)))
+			else -- pay rent either way
+				MySQL.Sync.execute('UPDATE users SET bank = bank - @bank WHERE identifier = @identifier',
+				{
+					['@bank']       = result[i].rent_price,
+					['@identifier'] = result[i].owner
+				})
+			end
+
+			TriggerEvent('esx_addonaccount:getSharedAccount', 'society_cardealer', function(account)
+				account.addMoney(result[i].rent_price)
+			end)
+		end
+	end)
+end
+
+TriggerEvent('cron:runAt', 22, 00, PayRent)
