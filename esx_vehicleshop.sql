@@ -3,7 +3,10 @@ USE `essentialmode`;
 CREATE TABLE IF NOT EXISTS `owned_vehicles` (
   `owner` varchar(30) NOT NULL,
   `plate` varchar(12) NOT NULL,
-  `vehicle` longtext
+  `vehicle` longtext,
+	`type` VARCHAR(20) NOT NULL DEFAULT 'car',
+  `job` VARCHAR(20) NOT NULL DEFAULT '',
+	`stored` TINYINT(1) NOT NULL DEFAULT '0',
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `rented_vehicles` (
