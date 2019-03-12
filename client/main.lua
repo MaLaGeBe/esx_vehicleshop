@@ -449,6 +449,7 @@ function drawLoadingText(text, red, green, blue, alpha)
 end
 
 RegisterNetEvent('esx:showVehicleNotification')
-AddEventHandler('esx:showVehicleNotification', function(msg,num)
-	ESX.ShowNotification(_U(msg,num))
+AddEventHandler('esx:showVehicleNotification', function(msg,...)
+	ESX.ShowNotification(_U(msg,...))
 end)
+

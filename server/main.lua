@@ -100,7 +100,7 @@ ESX.RegisterServerCallback('esx_vehicleshop_lite:buyVehicle', function (source, 
 	end
 end)
 
-ESX.RegisterServerCallback('esx_vehicleshop:resellVehicle', function (source, cb, plate, model)
+ESX.RegisterServerCallback('esx_vehicleshop_lite:resellVehicle', function (source, cb, plate, model)
 	local resellPrice = 0
 
 	-- calculate the resell price
@@ -112,7 +112,7 @@ ESX.RegisterServerCallback('esx_vehicleshop:resellVehicle', function (source, cb
 	end
 
 	if resellPrice == 0 then
-		print(('esx_vehicleshop: %s attempted to sell an unknown vehicle!'):format(GetPlayerIdentifiers(source)[1]))
+		print(('esx_vehicleshop_lite: %s attempted to sell an unknown vehicle!'):format(GetPlayerIdentifiers(source)[1]))
 		cb(false)
 	end
 
@@ -231,7 +231,7 @@ function PayRent(d, h, m)
 			-- message player if connected
 			if xPlayer ~= nil then
 				xPlayer.removeAccountMoney('bank', result[i].rent_price)
-				TriggerClientEvent('esx:showNotification', xPlayer.source, _U('paid_rental', ESX.Math.GroupDigits(result[i].rent_price)))
+				TriggerClientEvent('esx:showVehicleNotification', xPlayer.source, 'paid_rental', ESX.Math.GroupDigits(result[i].rent_price))
 			else -- pay rent either way
 				MySQL.Sync.execute('UPDATE users SET bank = bank - @bank WHERE identifier = @identifier',
 				{
