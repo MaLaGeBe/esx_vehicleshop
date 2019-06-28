@@ -189,7 +189,7 @@ ESX.RegisterServerCallback('esx_vehicleshop_lite:resellVehicle', function (sourc
 end)
 
 ESX.RegisterServerCallback('esx_vehicleshop_lite:isPlateTaken', function (source, cb, plate)
-	MySQL.Async.fetchAll('SELECT * FROM owned_vehicles WHERE plate = @plate', {
+	MySQL.Async.fetchAll('SELECT 1 FROM owned_vehicles WHERE plate = @plate', {
 		['@plate'] = plate
 	}, function (result)
 		cb(result[1] ~= nil)
