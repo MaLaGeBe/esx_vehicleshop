@@ -397,6 +397,7 @@ Citizen.CreateThread(function()
 		if CurrentAction == nil then
 			Citizen.Wait(500)
 		else
+
 			ESX.ShowHelpNotification(CurrentActionMsg)
 			if IsControlJustReleased(0, Keys['E']) then
 				if CurrentAction == 'shop_menu' then
@@ -409,6 +410,7 @@ Citizen.CreateThread(function()
 						else
 							ESX.ShowNotification(_U('not_yours'))
 						end
+
 					end, CurrentActionData.plate, CurrentActionData.model)
 				end
 				CurrentAction = nil
