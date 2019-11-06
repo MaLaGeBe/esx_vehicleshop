@@ -1,4 +1,4 @@
-Locales['zh'] = {
+Locales['tc'] = {
   --Global menus
   ['vehicle_belongs']         = '牌照為~y~%s~s~的汽車現在屬與~b~妳~s~了',
   ['buy_vehicle_shop']        = '妳想購買~r~%s~s~嗎？需花費~g~$%s。',

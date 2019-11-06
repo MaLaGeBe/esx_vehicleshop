@@ -106,10 +106,10 @@ function OpenShopMenu()
 		local categoryVehicles = vehiclesByCategory[category.name]
 		local options          = {}
 
-		if Config.Locale == 'zh' then
-			category.label = category.label_zh
-		elseif Config.Locale == 'cn' then
-			category.label = category.label_cn
+		if Config.Locale == 'tc' then
+			category.label = category.label_tc
+		elseif Config.Locale == 'sc' then
+			category.label = category.label_sc
 		end
 
 		for j=1, #categoryVehicles, 1 do
@@ -119,10 +119,10 @@ function OpenShopMenu()
 				firstVehicleData = vehicle
 			end
 
-			if Config.Locale == 'zh' then
-				vehicle.name = vehicle.name_zh
-			elseif Config.Locale == 'cn' then
-				vehicle.name = vehicle.name_cn
+			if Config.Locale == 'tc' then
+				vehicle.name = vehicle.name_tc
+			elseif Config.Locale == 'sc' then
+				vehicle.name = vehicle.name_sc
 			end
 
 			table.insert(options, ('%s <span style="color:green;">%s</span>'):format(vehicle.name, _U('generic_shopitem', ESX.Math.GroupDigits(vehicle.price))))
@@ -429,9 +429,9 @@ Citizen.CreateThread(function()
 end)
 
 function drawLoadingText(text, red, green, blue, alpha)
-	if Config.Locale == 'zh' then
+	if Config.Locale == 'tc' then
 		SetTextFont(9)
-	elseif Config.Locale == 'cn' then
+	elseif Config.Locale == 'sc' then
 		SetTextFont(12)
 	else 
 		SetTextFont(4)

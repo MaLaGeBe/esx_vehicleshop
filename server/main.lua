@@ -30,8 +30,8 @@ MySQL.ready(function()
 		for j=1, #Categories, 1 do
 			if Categories[j].name == vehicle.category then
 				vehicle.categoryLabel = Categories[j].label
-				vehicle.categoryLabel_cn = Categories[j].label_cn
-				vehicle.categoryLabel_zh = Categories[j].label_zh
+				vehicle.categoryLabel_sc = Categories[j].label_sc
+				vehicle.categoryLabel_tc = Categories[j].label_tc
 				break
 			end
 		end

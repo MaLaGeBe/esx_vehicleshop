@@ -20,14 +20,14 @@ CREATE TABLE IF NOT EXISTS `rented_vehicles` (
 
 CREATE TABLE IF NOT EXISTS `vehicles` (
   `name` varchar(60) NOT NULL,
-  `name_zh` varchar(120) NOT NULL,
-  `name_cn` varchar(120) NOT NULL,
+  `name_tc` varchar(120) NOT NULL,
+  `name_sc` varchar(120) NOT NULL,
   `model` varchar(60) NOT NULL,
   `price` int(11) NOT NULL,
   `category` varchar(60) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `vehicles` (`name`, `name_zh`, `name_cn`, `model`, `price`, `category`) VALUES
+INSERT INTO `vehicles` (`name`, `name_tc`, `name_sc`, `model`, `price`, `category`) VALUES
 ('Adder', '特盧菲 靈蛇', '特卢菲 灵蛇', 'adder', 900000, 'super'),
 ('Akuma', '卡丁 街頭惡魔', '卡丁 街头恶魔', 'AKUMA', 7500, 'motorcycles'),
 ('Alpha', '亞班尼 阿爾法', '亚班尼 阿尔法', 'alpha', 60000, 'sports'),
@@ -272,11 +272,11 @@ INSERT INTO `vehicles` (`name`, `name_zh`, `name_cn`, `model`, `price`, `categor
 CREATE TABLE IF NOT EXISTS `vehicle_categories` (
   `name` varchar(60) NOT NULL,
   `label` varchar(60) NOT NULL,
-  `label_zh` varchar(120) NOT NULL,
-  `label_cn` varchar(120) NOT NULL
+  `label_tc` varchar(120) NOT NULL,
+  `label_sc` varchar(120) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `vehicle_categories` (`name`, `label`, `label_zh`, `label_cn`) VALUES
+INSERT INTO `vehicle_categories` (`name`, `label`, `label_tc`, `label_sc`) VALUES
 ('bicycle', 'Bicycle', '單車', '自行车'),
 ('compacts', 'Compacts', '小轎車', '小型汽车'),
 ('coupes', 'Coupes', '轎跑車', '轿跑车'),
